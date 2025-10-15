@@ -35,8 +35,12 @@ def create_user(db: Session, user_in: schemas.UserCreate) -> models.User:
     return user
 
 
+def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
+    return db.execute(select(models.User).where(models.User.email == email)).scalar_one_or_none()
+
+
 def authenticate_user(db: Session, email: str, password: str) -> Optional[models.User]:
-    user = db.execute(select(models.User).where(models.User.email == email)).scalar_one_or_none()
+    user = get_user_by_email(db, email)
     if not user or not verify_password(password, user.hashed_password):
         return None
     return user
